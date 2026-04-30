@@ -1,99 +1,96 @@
-# production-ready AI CRM Dashboard
+# AI CRM Automation System
 
-Production-ready AI Sales Operating System — a modern, responsive CRM dashboard built with Next.js (App Router), React, Tailwind CSS and Supabase.
+## Overview
 
-This repository contains a polished demo-level application focused on fast developer iteration and production readiness: realtime data sync, accessible UI, mobile-first responsive layout, and clear integration points for LLMs and email delivery.
+Modern sales teams lose time to manual lead triage, enrichment, and follow-up drafting. This AI CRM automation system replaces that repetitive work with an automated pipeline: leads enter via a workflow, AI qualifies and enriches them, data is persisted, and a realtime dashboard surfaces next actions. The result is a fast, consistent, and scalable alternative to traditional SaaS CRMs for high-velocity pipelines.
 
-# AI Sales Operating System — Senior Project Pitch
+This project explicitly uses n8n as the orchestration and workflow automation engine.
 
-## Elevator pitch
+## Features
 
-A production-ready, modern CRM dashboard prototype built to demonstrate end-to-end product thinking and engineering execution for AI-enabled sales workflows. It combines realtime data sync, a polished SaaS UI, and clear integration points for LLM augmentation and transactional email delivery.
+- n8n workflow automation as the orchestration layer
+- AI lead qualification and scoring
+- Automated CRM enrichment (summary, email draft, next action)
+- Supabase persistence for structured lead data
+- Realtime dashboard for live lead monitoring
+- AI-generated sales actions for rapid follow-up
 
-## Why this project sells
+## Architecture
 
-- Product-first engineering: the UI and flows are designed for sales agents (lead list, quick actions, email drafts, next actions), not just demo screens.
-- Production-readiness in mind: realtime Postgres subscriptions (Supabase), accessibility fixes, PropTypes validation, and a mobile-first responsive layout.
-- Clear integration surface: LLM assistant, email API endpoints, and Supabase auth/RLS hooks are isolated so they can be hardened for production without large refactors.
+```
+Lead Input
+	↓
+n8n Workflow Engine
+	↓
+OpenRouter / Claude
+	↓
+JSON Parsing
+	↓
+Supabase
+	↓
+Dashboard UI
+```
 
-## Who this is for
+## Tech Stack
 
-- Recruiters: a compact demo to validate frontend architecture, product thinking, and experience with realtime systems.
-- Hiring managers: a candidate portfolio piece that shows ownership across design, frontend engineering, and integration with backend services.
-- Technical reviewers: clear, focused code paths for realtime updates, debounced search, and accessible UI components.
+| Layer         | Technology                     | Purpose                                                           |
+| ------------- | ------------------------------ | ----------------------------------------------------------------- |
+| Orchestration | n8n                            | Workflow automation engine for ingestion, scoring, and AI routing |
+| AI Gateway    | OpenRouter                     | Unified API gateway for LLM access                                |
+| LLM           | Claude 3 Haiku                 | Lead analysis, summary generation, and next actions               |
+| Database      | Supabase (Postgres + Realtime) | Persistence and realtime updates                                  |
+| Frontend      | Next.js                        | Dashboard UI and client-side data views                           |
+| Styling       | Tailwind CSS                   | Utility-first design system                                       |
 
-## Notable technical highlights (talking points)
+## Why n8n
 
-- Built with Next.js (App Router) + React 18 and Tailwind CSS for a modern frontend stack.
-- Realtime data with Supabase Postgres subscriptions replacing polling for instant UI updates.
-- Component-level PropTypes, keyboard-accessible overlays/drawers, and improved semantics for a11y.
-- Debounced search and client-side filter composition for fast, predictable UX.
-- Modular integrations: `lib/supabase.js`, `components/ChatPanel.jsx` (assistant surface), and `components/LeadDetailPanel.jsx` (actionable items).
+n8n was chosen as the orchestration engine because it offers a low-code, scalable, and fast-to-iterate workflow layer. It enables rapid internal SaaS development without building a full backend for every integration. With built-in retries, branching logic, and node-level observability, n8n provides production-style automation while keeping workflows editable and transparent.
 
-## Feature summary (what the product does)
+Key reasons:
 
-- Lead list with search, company and lead score filters.
-- Responsive LeadTable that collapses gracefully on small screens.
-- Right-hand LeadDetailPanel with practical actions: `Copy Email`, `Mark Done` (updates DB), and `Send Email` (mailto integration).
-- Assistant panel (mock) demonstrating LLM-driven quick prompts and summaries.
-- Realtime updates when leads change in the database.
+- Low-code workflow orchestration for faster iteration
+- Scalable automation patterns with retries and conditional branching
+- Rapid internal SaaS development without heavy backend overhead
 
-## Suggested resume / recruiter-ready bullets
+## Demo Video
 
-- Designed and implemented a modern CRM dashboard using Next.js, React, and Tailwind; implemented realtime Postgres subscriptions with Supabase to replace polling and ensure instantaneous UI updates.
-- Led Sprint 5 to completion: migrated to realtime updates, implemented responsive UI across major components, and hardened accessibility and component validation.
-- Architected clean integration points for LLM augmentation and transactional email APIs, enabling future secure server-side deployments without client refactors.
+Video link: https://drive.google.com/file/d/18-YoUNdFuBU6WPSZskO71uEb8VYEvgYI/view?usp=sharing
 
-## How to run (quick)
+## Setup Instructions
 
-1. Copy environment variables into `.env.local` (DO NOT commit):
+1. Clone the repo and install dependencies.
+
+```bash
+npm install
+```
+
+2. Configure environment variables.
 
 ```text
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+OPENROUTER_API_KEY=your-openrouter-key
 ```
 
-2. Install and start:
+3. Start the dashboard.
 
 ```bash
-npm install
 npm run dev
 ```
 
-3. Open http://localhost:3000 and navigate to `/leads`.
+4. Import and configure the n8n workflow with your OpenRouter and Supabase credentials.
 
-## Repository layout (quick reference)
+## Business Impact
 
-- `app/` — Next.js routes and pages, main entry is `app/leads/page.js`.
-- `components/` — Reusable UI components: `LeadTable`, `LeadFilters`, `LeadDetailPanel`, `ChatPanel`.
-- `lib/` — `supabase.js` client and `useDebounce.js` helper.
-- `styles/` — Tailwind global styles.
+This system simulates replacing traditional CRM SaaS by automating lead qualification, enrichment, and action generation. It reduces time-to-first-action, improves consistency in outreach, and scales lead operations without increasing headcount. The realtime dashboard provides immediate operational visibility and shortens feedback loops across sales teams.
 
-## Supabase and security notes
+## Future Improvements
 
-- The app reads leads from a `leads` table and subscribes to `postgres_changes` for that table. In development you may disable RLS to inspect data; in production enable RLS and add policies scoped to authenticated users.
-- Replace the client-side LLM usage with a server-side proxy or server action to protect API keys before production deployment.
+- Email sending
+- Slack alerts
+- Real-time AI assistant
+- Multi-agent workflows
 
-## Conversation and interview prompts (what to ask me)
+## Key Learnings
 
-- Why choose Supabase realtime over polling for this UI? (Discuss latency, efficiency, and UX implications.)
-- Which parts of the UI required accessibility fixes and why? (Discuss overlays, keyboard focus, and semantics.)
-- How would you securely integrate a production LLM here? (Discuss server-side proxy, rate limits, caching, and cost control.)
-
-## Roadmap & production hardening
-
-- Add Supabase Auth and RLS policies for multi-tenant access control.
-- Implement server-side LLM integration with request validation and rate limiting.
-- Add transactional email provider (SendGrid/Postmark) and queueing for reliability.
-- CI and E2E tests (Playwright) and automatic deployments (Vercel/Github Actions).
-
-## Contact / Demo
-
-If you'd like a live walkthrough, sample credentials for a demo Supabase project, or a short recorded demo, reach out and I will share them.
-
-— Senior Engineer / Product-focused Frontend
-
-Contact
-For help expanding this into a production-ready service (auth, billing, LLM integration, email), open an issue or contact the maintainer.
-
-— senior dev
+Learning and delivering a production-style n8n workflow in a short time demonstrates rapid adaptation to low-code business automation ecosystems.
